@@ -1,18 +1,21 @@
+import cors from 'cors';
 import express, { Request, Response } from 'express';
-import { HotelData, Query } from './/types/types';
+import { Query } from './/types/types';
 import { DefaultProvider } from './providers/defaultProvider';
 import { Provider } from './providers/provider.interface';
+import { Accommodation } from './apiModels';
 
 const app = express();
 const port = process.env.PORT || 5000;
 
 // In-memory cache
-const cache: { [key: string]: HotelData[] } = {};
+const cache: { [key: string]: Accommodation[] } = {};
 
 // Provider instance
 const defaultProvider: Provider = new DefaultProvider();
 
 app.use(express.json());
+app.use(cors());
 
 app.post('/api/search', async (req: Request, res: Response) => {
   try {
@@ -28,19 +31,15 @@ app.post('/api/search', async (req: Request, res: Response) => {
 
     // Check if the results are already in the cache
     if (cache[cacheKey]) {
-      cache[cacheKey].forEach((result) => {
-        res.write(`data: ${JSON.stringify(result)}\n\n`);
-      });
+      res.write(`${JSON.stringify(cache[cacheKey])}`);
       return res.end();
     }
 
     const initialResults = await defaultProvider.fetchHotelData(query);
 
     // Send the initial results
-    initialResults.forEach((result) => {
-      res.write(`data: ${JSON.stringify(result)}\n\n`);
-    });
-
+    res.write(`${JSON.stringify(initialResults)}`);
+    
     const largerGroupSizes = [group_size + 1, group_size + 2];
     const additionalResults = await Promise.all(
       largerGroupSizes.map(async (size) => {
@@ -53,13 +52,11 @@ app.post('/api/search', async (req: Request, res: Response) => {
     const sortedResults = aggregatedResults.sort((a, b) => 
       parseFloat(a.PricesInfo.AmountAfterTax) - parseFloat(b.PricesInfo.AmountAfterTax)
     );
-
-    // Send the additional results
-    sortedResults.forEach((result) => {
-      res.write(`data: ${JSON.stringify(result)}\n\n`);
-    });
-
-    // Store the sorted results in the cache
+    console.log(sortedResults)
+    // // Send the additional results
+    res.write(`${JSON.stringify(sortedResults)}`);
+    
+    // // Store the sorted results in the cache
     cache[cacheKey] = sortedResults;
 
     res.end();
