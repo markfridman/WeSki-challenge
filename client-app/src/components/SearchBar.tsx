@@ -44,15 +44,11 @@ const SearchBar: React.FC<{ onSearch: (results: any[]) => void }> = ({ onSearch 
         method: 'POST',
         onDownloadProgress: progressEvent => {
           const xhr = progressEvent.event.target
-          const { responseText } = xhr
-          console.log("=====responseText======")
-          console.log(responseText)
-          onSearch(JSON.parse(responseText));
+          const { response } = xhr
+          onSearch(JSON.parse(response));
         }
       })
-      // const response = await axios.post(apiUrl, requestBody);
-      // // const parsedData = response.data.json()
-      // console.log(response.data)
+
     } catch (error) {
       console.error('Error fetching hotel data:', error);
     }

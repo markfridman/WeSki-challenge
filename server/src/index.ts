@@ -52,9 +52,11 @@ app.post('/api/search', async (req: Request, res: Response) => {
     const sortedResults = aggregatedResults.sort((a, b) => 
       parseFloat(a.PricesInfo.AmountAfterTax) - parseFloat(b.PricesInfo.AmountAfterTax)
     );
-    console.log(sortedResults)
+    console.log(sortedResults, `${JSON.stringify(sortedResults)}`)
+
     // // Send the additional results
-    res.write(`${JSON.stringify(sortedResults)}`);
+    // TODO: Fix returning without comma
+    // res.write(`${sortedResults}`);
     
     // // Store the sorted results in the cache
     cache[cacheKey] = sortedResults;

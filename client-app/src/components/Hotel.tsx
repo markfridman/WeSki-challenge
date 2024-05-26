@@ -5,6 +5,7 @@ const Hotel: React.FC<{ hotel: Accommodation }> = ({ hotel }) => {
     <div>
       <h3>{hotel.HotelName}</h3>
       <p>Price: ${hotel.PricesInfo.AmountAfterTax}</p>
+      <img src={hotel.HotelDescriptiveContent.Images.filter((i) => i.MainImage)[0].URL} alt="" />
     </div>
   );
 };
